@@ -1,5 +1,3 @@
-"use client";
-
 import React, { PropsWithChildren, useRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -18,7 +16,7 @@ const DEFAULT_MAGNIFICATION = 60;
 const DEFAULT_DISTANCE = 140;
 
 const dockVariants = cva(
-  "supports-backdrop-blur:bg-white/10 supports-backdrop-blur:dark:bg-black/10 mx-auto mt-8 flex h-[58px] w-max gap-2 rounded-2xl border p-2 backdrop-blur-md",
+  "supports-backdrop-blur:bg-white/10 supports-backdrop-blur:dark:bg-black/10 mx-auto mt-8 flex h-[58px] w-max gap-2 rounded-2xl border p-2 backdrop-blur-md"
 );
 
 const Dock = React.forwardRef<HTMLDivElement, DockProps>(
@@ -31,7 +29,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
       direction = "bottom",
       ...props
     },
-    ref,
+    ref
   ) => {
     const mouseX = useMotionValue(Infinity);
 
@@ -64,7 +62,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
         {renderChildren()}
       </motion.div>
     );
-  },
+  }
 );
 
 Dock.displayName = "Dock";
@@ -76,6 +74,7 @@ export interface DockIconProps {
   mouseX?: any;
   className?: string;
   children?: React.ReactNode;
+  onClick?: () => void; 
   props?: PropsWithChildren;
 }
 
@@ -86,6 +85,7 @@ const DockIcon = ({
   mouseX,
   className,
   children,
+  onClick, 
   ...props
 }: DockIconProps) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -99,7 +99,7 @@ const DockIcon = ({
   let widthSync = useTransform(
     distanceCalc,
     [-distance, 0, distance],
-    [40, magnification, 40],
+    [40, magnification, 40]
   );
 
   let width = useSpring(widthSync, {
@@ -114,8 +114,9 @@ const DockIcon = ({
       style={{ width }}
       className={cn(
         "flex aspect-square cursor-pointer items-center justify-center rounded-full",
-        className,
+        className
       )}
+      onClick={onClick} // Applied the onClick handler here
       {...props}
     >
       {children}

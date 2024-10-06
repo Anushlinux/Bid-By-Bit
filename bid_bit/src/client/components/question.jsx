@@ -76,6 +76,27 @@ const Question = () => {
           ) : (
             <p>No test cases available</p>
           )}
+          <ul>
+            {problem.constraints.map((constraint, type) => (
+              <li key={type}>
+                {constraint.type}: {constraint.description}
+              </li>
+            ))}
+          </ul>
+          <ul>
+            {problem.examples.map((example, index) => (
+              <li key={index}>
+                Example {index + 1}: <span>Input:</span>
+                <span>{example.input},</span>
+                <span>
+                  <ul>Expected Output: {example.output}</ul>
+                </span>
+                <span>
+                  <ul>Explanation: {example.explanation}</ul>
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

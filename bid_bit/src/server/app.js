@@ -284,12 +284,17 @@ app.delete("/api/problems/:id", verifyToken, adminCheck, async (req, res) => {
   }
 });
 
+
+
 app.post("/api/execute", async (req, res) => {
-  const payload = req.body;
+  const { code, language } = req.body;
 
   try {
     // Make a request to the Go service running on port 9000
-    const response = await axios.post("http://localhost:9000/execute", payload);
+    const response = await axios.post("http://localhost:9000/api/execute", {
+      code: code,
+      language: language,
+    });
 
     // Send the response back to the client
     res.status(200).json(response.data);

@@ -32,7 +32,21 @@ const problemSchema = new mongoose.Schema(
       },
     ],
 
-    
+    constraints: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+
+    examples: [
+      {
+        example: { type: Number, required: true },
+        input: { type: String, required: true },
+        output: { type: String, required: true },
+        explanation: { type: String },
+      },
+    ],
   },
 
   { timestamps: true }
