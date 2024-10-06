@@ -1,5 +1,6 @@
 import React from "react";
 import Editor from "@monaco-editor/react";
+import Dropdown from "../assets/dropdown";
 
 const App = () => {
   const handleEditorWillMount = (monaco) => {
@@ -8,7 +9,7 @@ const App = () => {
       inherit: true,
       rules: [],
       colors: {
-        "editor.background": "#000000",
+       
       },
     });
   };
@@ -34,24 +35,29 @@ const App = () => {
   };
 
   return (
-    <div
-      className="flex justify-end min-h-screen bg-black"
-      style={{
-        padding: "0rem 0",
-        backgroundColor: "",
-      }}
-    >
+    <div>
       <div
         style={{
-          width: "50vw",
-          height: "calc(84vh - 1rem)",
+          width: "48vw",
+          height: "calc(84vh)",
           marginLeft: "auto",
-          marginTop: "3.5rem",
+          marginTop: "6rem",
           borderRadius: "10px",
-          border: "1px solid #FF0000",
+          border: "1px solid ",
           overflow: "hidden",
         }}
       >
+        <div
+          className="font-sans text-xl text-white py-2 px-4 "
+          style={{ backgroundColor: "#2e2e2e" }}
+        >
+          <span className="text-green-500">{`</> `}</span>
+          Code
+        </div>
+        <div className="px-2 " style={{ backgroundColor: "#1e1e1e" }}>
+          <Dropdown />
+        </div>
+        <div className="h-0 w-full border-t border-gray-600"></div>
         <Editor
           height="100%"
           width="100%"
@@ -60,13 +66,14 @@ const App = () => {
           beforeMount={handleEditorWillMount}
           onMount={handleEditorDidMount}
           options={{
-            fontSize: 14,
+            fontSize: 20,
             minimap: {
               enabled: true,
             },
             contextmenu: false,
             padding: { top: 20, bottom: 20 },
           }}
+          value={`**Code <>**\n\n`}
         />
       </div>
     </div>

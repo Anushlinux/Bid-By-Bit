@@ -1,0 +1,7 @@
+.dock-custom-border {
+  border: 1px solid rgba(117, 110, 110, 0.5); /* Adjust the RGBA values to make it less white */
+}
+
+.glassy-navbar {
+  backdrop-filter: blur(10px);
+}
