@@ -5,12 +5,25 @@ import axios from "axios";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import cors from "cors";
+
+
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 const PORT = 5000;
+
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 // Connect to MongoDB database
 mongoose

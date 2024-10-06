@@ -1,9 +1,42 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const question = () => {
+const Question = () => {
+  const [problem, setProblem] = useState(null); // Initialize as null
+  const [loading, setLoading] = useState(true); // Set true by default
+  const [error, setError] = useState(null); // Initialize as null
+
+  useEffect(() => {
+    const fetchProblem = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/problems");
+        console.log(response.data);
+
+        if (response.data && response.data.length > 0) {
+          // Assuming you want to fetch the first problem in the array
+          setProblem(response.data[0]);
+        } else {
+          setProblem(null);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching problem:", err);
+        setError("Error fetching problem");
+        setLoading(false);
+      }
+    };
+
+    fetchProblem();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+  if (!problem) return <div>No problem found</div>;
+
   return (
     <div
-      className="mx-auto w-1/2 px-4 sm:px-6 bg-slate-500 lg:px-8"
+      className="mx-auto w-1/2 px-4 sm:px-6 lg:px-8"
       style={{
         width: "50vw",
         height: "calc(84vh)",
@@ -12,12 +45,41 @@ const question = () => {
         borderRadius: "10px",
         border: "1px solid ",
         overflow: "hidden",
+        backgroundColor: "#2e2e2e",
       }}
     >
-      {/* We've used 3xl here, but feel free to try other max-widths based on your needs */}
-      <div className="mx-auto max-w-3xl">sdsfdfds</div>
+      <div className="mx-auto max-w-3xl mt-3">
+        <h1 className="text-4xl font-bold text-white mb-4">{problem.title}</h1>
+        <div className="text-white mb-4">
+          <strong></strong>{" "}
+          {problem.tags ? problem.tags.join(", ") : "No tags available"}
+        </div>
+        <p className="text-white text-xl mb-4">{problem.description}</p>
+        <div className="text-white mb-4">
+          <strong>Difficulty:</strong> {problem.difficulty}
+        </div>
+
+        {/* Check if tags exist before rendering */}
+
+        {/* Check if testcases exist before rendering */}
+        <div className="text-white">
+          <strong>Test Cases:</strong>
+          {problem.testcases && problem.testcases.length > 0 ? (
+            <ul>
+              {problem.testcases.map((testCase, index) => (
+                <li key={index}>
+                  Input: {testCase.input}, Expected Output:{" "}
+                  {testCase.expectedOutput}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No test cases available</p>
+          )}
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-export default question
+export default Question;
