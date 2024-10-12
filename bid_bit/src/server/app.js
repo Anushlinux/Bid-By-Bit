@@ -6,7 +6,10 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cors from "cors";
-import YAML from "yaml";
+
+import User from "./models/user";
+import Team from "./models/team";
+import Problem from "./models/problem";
 
 dotenv.config();
 
@@ -39,147 +42,53 @@ mongoose.connection.on("error", (err) => {
   console.error("MongoDB connection error:", err);
 });
 
-// Define a schema for the User collection
-const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
-  isAdmin: { type: Boolean, default: false },
-});
-
 //github auth
 const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
-app.get("/api/github/login", (req, res) => {
-  const state = crypto.randomBytes(16).toString("hex");
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&state=${state}&redirect_uri=http://localhost:5173/api/github/callback&scope=repo`;
-
-  res.json({ url: githubAuthUrl, state });
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.SERVER_URL + process.env.GOOGLE_CALLBACK_URL,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = User.findOne({ email: profile.emails[0].value });
+        return done(null, user);
+      } catch (e) {
+        let email = profile.emails[0].value;
+        try {
+          let user = User.create({
+            name: profile.displayName,
+            email: email,
+            photo_url: profile.photos[0].value,
+            role: "USER",
+          });
+          return done(null, user);
+        } catch (err) {
+          logger.error(err);
+          return done(new Error("error fetching/creating user"), null);
+        }
+      }
+    },
+  ),
+);
+passport.serializeUser((user, done) => {
+  done(null, user);
 });
-
-app.get("/api/github/callback", async (req, res) => {
-  const { code, state: receivedState } = req.query;
-
-  const storedState = localStorage.getItem("latestCSRFToken");
-  if (receivedState !== storedState) {
-    return res.status(403).send("CSRF validation failed");
-  }
-
+passport.deserializeUser(async (user, done) => {
   try {
-    const tokenResponse = await axios.post(
-      "https://github.com/login/oauth/access_token",
-      null,
-      {
-        params: {
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-          code,
-          redirect_uri: "http://localhost:5173/api/github/callback",
-        },
-        headers: {
-          Accept: "application/json",
-        },
-      },
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-
-    res.json({ access_token: accessToken });
+    const p = await User.findOne({ email: user.email });
+    done(null, user);
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error exchanging code for access token");
+    done(error, null);
   }
 });
-
-// Create a User model based on the schema
-const User = mongoose.model("User", userSchema);
 
 // Middleware to parse JSON bodies
 app.use(express.json());
-
-// Middleware for JWT validation
-const verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"];
-  if (!token) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  jwt.verify(token, "secret", (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    req.user = {
-      _id: decoded._id,
-      email: decoded.email,
-      isAdmin: decoded.isAdmin,
-    };
-    next();
-  });
-};
-
-const adminCheck = (req, res, next) => {
-  if (!req.user || !req.user.isAdmin) {
-    return res.status(403).json({ error: "Forbidden: Admin access required" });
-  }
-  next();
-};
-
-// Route to register a new user
-app.post("/api/register", async (req, res) => {
-  try {
-    // Check if the email already exists
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already exists" });
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-    // Create a new user
-    const newUser = new User({
-      username: req.body.username,
-      email: req.body.email,
-      password: hashedPassword,
-    });
-
-    await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// Route to authenticate and log in a user
-app.post("/api/login", async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const passwordMatch = await bcrypt.compare(
-      req.body.password,
-      user.password,
-    );
-
-    if (!passwordMatch) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const token = jwt.sign(
-      { _id: user._id, email: user.email, isAdmin: user.isAdmin },
-      "secret",
-    );
-
-    res.status(200).json({ token });
-  } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 // Protected route to get user details
 app.get("/api/user", verifyToken, async (req, res) => {
@@ -194,8 +103,6 @@ app.get("/api/user", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-import Problem from "./models/problem.js";
 
 // Create a new problem (Admins only)
 app.post("/api/problems", verifyToken, adminCheck, async (req, res) => {
@@ -325,31 +232,6 @@ app.post("/api/execute", async (req, res) => {
 
 app.get("/", async (req, res) => {
   res.send("Welcome to my User Registration and Login API!");
-  const job = {
-    name: "Sample job",
-    tasks: [
-      {
-        name: "Task 1",
-        image: "python:3-alpine",
-        files: {
-          "script.py": "print('Hello, World!')",
-        },
-        run: "python script.py > $TORK_OUTPUT",
-      },
-    ],
-  };
-  const ym = YAML.stringify(job);
-  // console.log(ym);
-  const resp = await axios.post(
-    "http://localhost:8000/jobs",
-    JSON.stringify(job),
-    {
-      headers: {
-        "Content-Type": "text/yaml",
-      },
-    },
-  );
-  console.log(resp.data);
 });
 
 app.listen(PORT, () => {

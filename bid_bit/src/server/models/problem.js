@@ -1,44 +1,35 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
-const problemSchema = new mongoose.Schema(
+const problemSchema = new Schema(
   {
+    _id: Schema.Types.ObjectId,
     title: {
       type: String,
-
       required: true,
     },
-
     description: {
       type: String,
-
       required: true,
     },
-
     difficulty: {
       type: String,
-
       enum: ["Easy", "Medium", "Hard"],
-
       required: true,
     },
-
+    team: { type: Schema.Types.ObjectId, ref: "Team" },
     tags: [String],
-
     testCases: [
       {
         input: { type: String, required: true },
-
         expectedOutput: { type: String, required: true },
       },
     ],
-
     constraints: [
       {
         type: String,
         required: true,
       },
     ],
-
     examples: [
       {
         example: { type: Number, required: true },
@@ -48,10 +39,9 @@ const problemSchema = new mongoose.Schema(
       },
     ],
   },
-
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const Problem = mongoose.model("Problem", problemSchema);
+const Problem = model("Problem", problemSchema);
 
 export default Problem;
