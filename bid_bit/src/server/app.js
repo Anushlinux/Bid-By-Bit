@@ -6,15 +6,13 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cors from "cors";
-
-
+import YAML from "yaml";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-const PORT = 5000;
-
+const PORT = 4000;
 
 app.use(
   cors({
@@ -22,13 +20,13 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  })
+  }),
 );
 
 // Connect to MongoDB database
 mongoose
   .connect(
-    "mongodb+srv://anushrutp:sherlock@bidbybitdb.cxzwf.mongodb.net/?retryWrites=true&w=majority&appName=bidbybitdb"
+    "mongodb+srv://anushrutp:sherlock@bidbybitdb.cxzwf.mongodb.net/?retryWrites=true&w=majority&appName=bidbybitdb",
   )
   .then(() => {
     console.log("Connected to MongoDB");
@@ -82,7 +80,7 @@ app.get("/api/github/callback", async (req, res) => {
         headers: {
           Accept: "application/json",
         },
-      }
+      },
     );
 
     const accessToken = tokenResponse.data.access_token;
@@ -164,7 +162,7 @@ app.post("/api/login", async (req, res) => {
 
     const passwordMatch = await bcrypt.compare(
       req.body.password,
-      user.password
+      user.password,
     );
 
     if (!passwordMatch) {
@@ -173,7 +171,7 @@ app.post("/api/login", async (req, res) => {
 
     const token = jwt.sign(
       { _id: user._id, email: user.email, isAdmin: user.isAdmin },
-      "secret"
+      "secret",
     );
 
     res.status(200).json({ token });
@@ -258,7 +256,7 @@ app.put("/api/problems/:id", verifyToken, adminCheck, async (req, res) => {
         tags: req.body.tags,
         testCases: req.body.testCases,
       },
-      { new: true }
+      { new: true },
     );
 
     if (!problem) {
@@ -284,18 +282,39 @@ app.delete("/api/problems/:id", verifyToken, adminCheck, async (req, res) => {
   }
 });
 
-
-
 app.post("/api/execute", async (req, res) => {
   const { code, language } = req.body;
 
   try {
     // Make a request to the Go service running on port 9000
-    const response = await axios.post("http://localhost:9000/api/execute", {
-      code: code,
-      language: language,
-    });
-
+    // const response = await axios.post("http://localhost:8000/api/execute", {
+    //   code: code,
+    //   language: language,
+    // });
+    console.log(typeof code);
+    const job = {
+      name: "Sample job",
+      tasks: [
+        {
+          name: "Task 1",
+          image: "node:20-alpine",
+          files: {
+            "index.js": code,
+          },
+          run: "node index.js > $TORK_OUTPUT",
+        },
+      ],
+    };
+    console.log(job);
+    const response = await axios.post(
+      "http://localhost:8000/jobs",
+      JSON.stringify(job),
+      {
+        headers: {
+          "Content-Type": "text/yaml",
+        },
+      },
+    );
     // Send the response back to the client
     res.status(200).json(response.data);
   } catch (error) {
@@ -304,8 +323,33 @@ app.post("/api/execute", async (req, res) => {
   }
 });
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   res.send("Welcome to my User Registration and Login API!");
+  const job = {
+    name: "Sample job",
+    tasks: [
+      {
+        name: "Task 1",
+        image: "python:3-alpine",
+        files: {
+          "script.py": "print('Hello, World!')",
+        },
+        run: "python script.py > $TORK_OUTPUT",
+      },
+    ],
+  };
+  const ym = YAML.stringify(job);
+  // console.log(ym);
+  const resp = await axios.post(
+    "http://localhost:8000/jobs",
+    JSON.stringify(job),
+    {
+      headers: {
+        "Content-Type": "text/yaml",
+      },
+    },
+  );
+  console.log(resp.data);
 });
 
 app.listen(PORT, () => {

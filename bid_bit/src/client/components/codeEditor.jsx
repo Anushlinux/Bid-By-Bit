@@ -18,9 +18,9 @@ const CodeEditor = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/execute", {
+      const response = await axios.post("http://localhost:4000/api/execute", {
         code: code,
-        language: "javascript", 
+        language: "javascript",
       });
       setOutput(response.data.output);
     } catch (error) {

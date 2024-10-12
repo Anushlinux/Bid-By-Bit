@@ -11,6 +11,11 @@ import (
 	"github.com/runabol/tork/conf"
 )
 
+func hello(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "hello\n")
+	// return "hello"
+}
+
 func main() {
 	// Load Tork configuration
 	if err := conf.LoadConfig(); err != nil {
@@ -18,8 +23,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	http.HandleFunc("/", hello)
 	// Register the /execute endpoint and assign it to the handler
-	http.HandleFunc("/execute", handler.Handler)
+	http.HandleFunc("/api/execute", handler.Handler)
 
 	// Start HTTP server on port 9000
 	go func() {
