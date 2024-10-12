@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Playground from "./pages/code";
 import "./App.css";
-import React from "react";
+import Admin from "./pages/admin";
 
 function App() {
   
@@ -11,6 +11,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/problem" element={<Playground />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Router>
     </>
