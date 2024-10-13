@@ -2,6 +2,7 @@ import React, { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import ReactMarkdown from "react-markdown"; 
+import Allocation from "../components/teamAllocation";
 
 const statuses = {
   Complete: "text-green-700 bg-green-50 ring-green-600/20",
@@ -142,9 +143,9 @@ export default function ProblemManagement() {
               <div className="flex flex-none items-center gap-x-4">
                 <a
                   href={project.href}
-                  className="hidden rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 sm:block"
+                  className="hidden rounded-md  px-2.5 py-1.5 text-sm font-semibold text-white shadow-s sm:block"
                 >
-                  View project<span className="sr-only">, {project.name}</span>
+                  <Allocation />
                 </a>
               </div>
             </div>
