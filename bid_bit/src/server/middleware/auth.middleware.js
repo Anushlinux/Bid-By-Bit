@@ -14,7 +14,6 @@ async function authCheck(req, res, next) {
   try {
     token = token.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
     let user = await User.findById(decoded.user_id);
     if (user) {
       if (user.team) {

@@ -106,6 +106,8 @@ router.post("/:id/members", adminCheck, async (req, res) => {
     }
     team.members.push(memberId);
     await team.save();
+    user.team = team._id;
+    await user.save();
     res.status(200).json(team);
   } catch (error) {
     console.error("Error adding member to team:", error);
