@@ -36,7 +36,7 @@ export default function Component() {
           {challenges.map((challenge, index) => (
             <div
               key={index}
-              className="bg-gray-400/30  p-4 rounded-lg flex flex-row justify-between w-full shadow-md hover:shadow-lg transition-shadow duration-300"
+              className="bg-gray-400/30 border border-white-1 p-4 rounded-lg flex flex-row justify-between w-full shadow-md hover:shadow-lg transition-shadow duration-300"
             >
               <div className="flex flex-col justify-center">
                 <h2 className="font-semibold text-gray-100">
