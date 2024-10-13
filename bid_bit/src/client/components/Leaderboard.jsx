@@ -23,29 +23,20 @@ export default function Leaderboard() {
   ];
 
   return (
-    <div className="h-full bg-[#2e2e2e] text-white font-sans flex justify-center items-center rounded-lg">
-      <main className="p-6 w-full max-w-7xl">
-        <h1 className="text-center text-2xl font-bold mb-4">Leaderboard</h1>
-        <div className="flex flex-wrap gap-4 justify-center">
-          {users.map((user, index) => (
-            <div
-              key={index}
-              className="bg-[#3e3e3e] p-4 rounded-lg flex flex-row justify-between w-full shadow-md hover:shadow-lg transition-shadow duration-300"
-            >
-              <div className="flex flex-col justify-center">
-                <h2 className="font-semibold text-gray-100">
-                  #{index + 1} {user.name}
-                </h2>
-              </div>
-              <div className="flex items-center m-2">
-                <p className="text-sm font-bold text-gray-100">
-                  {user.points} Points
-                </p>
-              </div>
-            </div>
-          ))}
+    <div className="text-white w-full max-w-2xl divide-y divide-gray-700">
+      <h1 className="text-center text-2xl pr-12 font-bold mb-4">Leaderboard</h1>
+      {users.map((user, index) => (
+        <div
+          key={index}
+          className="flex flex-row justify-between items-center py-4"
+        >
+          <h2 className="font-semibold text-gray-100 ">#{index + 1}</h2>
+          <h2 className="text-center">{user.name}</h2>
+          <h2 className="text-sm font-bold text-gray-100">
+            {user.points} Points
+          </h2>
         </div>
-      </main>
+      ))}
     </div>
   );
 }
