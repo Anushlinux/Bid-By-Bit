@@ -1,9 +1,7 @@
 import jwt from "jsonwebtoken";
-import prisma from "../utils/prisma_client";
-import logger from "../utils/logger";
 
-import User from "../models/user";
-import Team from "../models/team";
+import User from "../models/user.js";
+import Team from "../models/team.js";
 
 async function authCheck(req, res, next) {
   let token = req.headers["authorization"];
@@ -16,17 +14,19 @@ async function authCheck(req, res, next) {
   try {
     token = token.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    try {
-      let user = await User.findOne({
-        email: decoded.email,
-      }).populate("team");
+    console.log(decoded);
+    let user = await User.findById(decoded.user_id);
+    if (user) {
+      if (user.team) {
+        user.team = await Team.findById(user.team);
+      }
       req.user = user;
-    } catch (err) {
-      logger.error(err);
+    } else {
+      console.log(user);
       return res.status(401).json({ error: true, message: "User not found" });
     }
   } catch (err) {
+    console.error(err);
     return res.status(401).json({ error: true, message: "Invalid Token" });
   }
   return next();

@@ -20,6 +20,6 @@ const teamSchema = new Schema({
   ],
 });
 
-const Team = model("Team", problemSchema);
+const Team = model("Team", teamSchema);
 
 export default Team;
