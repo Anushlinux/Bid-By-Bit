@@ -23,8 +23,8 @@ export default function Leaderboard() {
   ];
 
   return (
-    <div className="text-white w-full max-w-2xl divide-y divide-gray-700">
-      <h1 className="text-center text-2xl pr-12 font-bold mb-4">Leaderboard</h1>
+    <div className="text-white w-1/3 min-h-full max-w-2xl divide-y divide-gray-700">
+      <h1 className="text-start text-2xl pr-12 font-bold mb-4">Leaderboard</h1>
       {users.map((user, index) => (
         <div
           key={index}
