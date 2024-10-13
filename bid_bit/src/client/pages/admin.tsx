@@ -1,6 +1,6 @@
 import React from 'react'
 import CreateQues from '../components/createQues';
-import QuesList from '../components/problemList'
+import QuesList from '../components/AdminProbList'
 
 
 export default function TabsDemo() {
@@ -17,3 +17,4 @@ export default function TabsDemo() {
   );
 };
 
+        
