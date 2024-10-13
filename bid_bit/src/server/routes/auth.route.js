@@ -1,7 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import passport from "passport";
-import User from "../models/user";
+import User from "../models/user.js";
 
 const router = express.Router();
 
@@ -28,10 +28,9 @@ router.get(
       { expiresIn: process.env.RT_EXPIRATION },
     );
 
-    const userDB = await User.findOneAndUpdate(
-      { email: user.email },
-      { refresh_token: refreshToken },
-    ).catch((e) => {
+    const userDB = await User.findById(user.id, {
+      refresh_token: refreshToken,
+    }).catch((e) => {
       logger.error(e);
       res.redirect(`${process.env.CLIENT_URL}?failure=${500}`);
     });
