@@ -6,7 +6,7 @@ export default function Login() {
   const navigate = useNavigate();
   const login = () => {
     window.open(
-      import.meta.env.VITE_APP_SERVER_ADDRESS + "/api/v1/auth/google",
+      import.meta.env.VITE_APP_SERVER_ADDRESS + "/api/auth/google",
       "_self",
     );
   };

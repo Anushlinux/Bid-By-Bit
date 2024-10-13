@@ -10,20 +10,19 @@ export default function Protected() {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/user/me",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
+      const response = await axios.request({
+        baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
+        url: "/api/user/me",
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-      );
-      if (response.error) {
+      });
+      if (!response.data) {
         throw new Error("error fetching");
       }
-      if (response && response.user) {
-        setUserData(response.user);
+      if (response.data) {
+        setUserData(response.data);
         return { status: 200 };
       } else {
         setUserData(null);

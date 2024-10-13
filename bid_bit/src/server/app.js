@@ -17,6 +17,7 @@ import Problem from "./models/problem.js";
 import authRoutes from "./routes/auth.route.js";
 import problemsRoutes from "./routes/problems.route.js";
 import teamsRoutes from "./routes/teams.route.js";
+import userRouter from "./routes/user.route.js";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ const PORT = 4000;
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -106,6 +107,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemsRoutes);
 app.use("/api/teams", teamsRoutes);
+app.use("/api/user", userRouter);
 
 // Protected route to get user details
 // app.get("/api/user", verifyToken, async (req, res) => {
