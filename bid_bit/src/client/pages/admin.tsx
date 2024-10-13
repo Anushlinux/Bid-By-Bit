@@ -1,6 +1,6 @@
 import React from 'react'
 import CreateQues from '../components/createQues';
-
+import QuesList from '../components/problemList'
 
 
 export default function TabsDemo() {
@@ -10,7 +10,9 @@ export default function TabsDemo() {
       <div className="text-4xl font-bold text-white sm:truncate sm:text-5xl sm:tracking-tight pt-10 ml-12">
         Admin
       </div>
+      <QuesList />
       <CreateQues />
+      
     </div>
   );
 };
