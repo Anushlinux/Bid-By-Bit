@@ -41,6 +41,7 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   const user = req.user;
   try {
+    console.log(user);
     await user.team.populate("problems");
     const problems = user.team.problems;
     res.status(200).json(problems);

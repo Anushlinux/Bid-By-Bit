@@ -1,8 +1,6 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import ReactMarkdown from "react-markdown";
-import Allocation from "../components/teamAllocation";
+import axios from "axios";
 
 const statuses = {
   Complete: "text-green-700 bg-green-50 ring-green-600/20",
@@ -10,32 +8,13 @@ const statuses = {
   Archived: "text-yellow-800 bg-yellow-50 ring-yellow-600/20",
 };
 
-const initialProjects = [
-  {
-    id: 1,
-    name: "GraphQL API",
-    href: "#",
-    status: "Complete",
-    dueDate: "March 17, 2023",
-    dueDateTime: "2023-03-17T00:00Z",
-    difficulty: "Medium",
-    description: "Implement a GraphQL API for our new service.",
-    examples: "Example query: { user(id: 1) { name, email } }",
-    tags: ["GraphQL", "API", "Backend"],
-    testCases: {
-      input: "query { user(id: 1) }",
-      output: "{ user: { name: 'John', email: 'john@example.com' } }",
-    },
-  },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function ProblemManagement() {
   const [isOpen, setIsOpen] = useState(false);
-  const [projects, setProjects] = useState(initialProjects);
+  const [problems, setProblems] = useState([]);
   const [formData, setFormData] = useState({
     problemTitle: "",
     problemDifficulty: "easy",
@@ -45,6 +24,31 @@ export default function ProblemManagement() {
     testCaseInput: "",
     testCaseOutput: "",
   });
+
+  useEffect(() => {
+    const fetchProblems = async () => {
+      try {
+        const response = await axios.request({
+          baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
+          url: `/api/problems`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        if (!response.data) {
+          throw new Error("Failed to fetch problems");
+        }
+        const data = response.data;
+        console.log(data);
+        setProblems(data);
+      } catch (error) {
+        console.error("Error fetching problems:", error);
+      }
+    };
+
+    fetchProblems();
+  }, []);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -56,34 +60,6 @@ export default function ProblemManagement() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newProblem = {
-      id: projects.length + 1,
-      name: formData.problemTitle,
-      href: "#",
-      status: "In progress",
-      createdBy: "Current User",
-      dueDate: new Date().toLocaleDateString(),
-      dueDateTime: new Date().toISOString(),
-      difficulty: formData.problemDifficulty,
-      description: formData.problemDescription,
-      examples: formData.problemExamples,
-      tags: formData.problemTags.split(",").map((tag) => tag.trim()),
-      testCases: {
-        input: formData.testCaseInput,
-        output: formData.testCaseOutput,
-      },
-    };
-    setProjects([...projects, newProblem]);
-    setIsOpen(false);
-    setFormData({
-      problemTitle: "",
-      problemDifficulty: "easy",
-      problemDescription: "",
-      problemExamples: "",
-      problemTags: "",
-      testCaseInput: "",
-      testCaseOutput: "",
-    });
   };
 
   const inputStyle =
@@ -107,74 +83,81 @@ export default function ProblemManagement() {
       </div>
 
       <ul>
-        {projects.map((project) => (
+        {problems.map((problem) => (
           <li
-            key={project.id}
+            key={problem._id}
             className="flex flex-col gap-y-2 py-5 border-b border-gray-700"
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0">
                 <div className="flex items-start gap-x-3">
                   <p className="text-lg font-semibold leading-6 text-white">
-                    {project.name}
+                    {problem.title || "Untitled Problem"}
                   </p>
                   <p
                     className={classNames(
-                      statuses[project.status],
+                      statuses[problem.status] || statuses["In progress"],
                       "rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset"
                     )}
                   >
-                    {project.status}
+                    {problem.status || "In progress"}
                   </p>
                 </div>
                 <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-400">
                   <p className="whitespace-nowrap">
                     Created on{" "}
-                    <time dateTime={project.dueDateTime}>
-                      {project.dueDate}
+                    <time dateTime={problem.createdAt}>
+                      {new Date(problem.createdAt).toLocaleDateString()}
                     </time>
                   </p>
                   <svg viewBox="0 0 2 2" className="h-0.5 w-0.5 fill-current">
                     <circle cx={1} cy={1} r={1} />
                   </svg>
-                  <p className="truncate">Created by {project.createdBy}</p>
+                  <p className="truncate">
+                    Created by {problem.createdBy || "Unknown"}
+                  </p>
                 </div>
               </div>
               <div className="flex flex-none items-center gap-x-4">
                 <a
-                  href={project.href}
-                  className="hidden rounded-md  px-2.5 py-1.5 text-sm font-semibold text-white shadow-s sm:block"
+                  href={`#problem-${problem._id}`}
+                  className="hidden rounded-md px-2.5 py-1.5 text-sm font-semibold text-white shadow-s sm:block"
                 >
-                  <Allocation />
+                  View Details
                 </a>
               </div>
             </div>
 
             <div className="mt-2 text-sm text-gray-300">
               <p>
-                <strong>Difficulty:</strong> {project.difficulty}
+                <strong>Difficulty:</strong>{" "}
+                {problem.difficulty || "Not specified"}
               </p>
               <p>
-                <strong>Description:</strong>
-                <ReactMarkdown className="prose prose-invert">
-                  {project.description}
-                </ReactMarkdown>
+                <strong>Description:</strong>{" "}
+                {problem.description || "No description provided"}
               </p>
               <p>
-                <strong>Examples:</strong>
-                <ReactMarkdown className="prose prose-invert">
-                  {project.examples}
-                </ReactMarkdown>
+                <strong>Example:</strong>
               </p>
+              {problem.examples && problem.examples.length > 0 ? (
+                problem.examples.map((example, index) => (
+                  <div key={index} className="ml-4 mb-2">
+                    <p>{index + 1}. </p>
+                    <p>Input: {example.input || "Not specified"}</p>
+                    <p>Output: {example.output || "Not specified"}</p>
+                    <p>
+                      Explanation:{" "}
+                      {example.explanation || "No explanation provided"}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="ml-4">No examples provided</p>
+              )}
               <p>
-                <strong>Tags:</strong> {project.tags.join(", ")}
-              </p>
-              <p>
-                <strong>Test Case:</strong>
-              </p>
-              <p className="ml-4">Input: {project.testCases.input}</p>
-              <p className="ml-4">
-                Expected Output: {project.testCases.output}
+                <strong>Tags:</strong>{" "}
+                {problem.tags ? problem.tags.join(", ") : "No tags"}
               </p>
             </div>
           </li>
