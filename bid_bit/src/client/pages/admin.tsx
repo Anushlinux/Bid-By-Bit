@@ -11,7 +11,7 @@ export default function TabsDemo() {
         Admin
       </div>
       <QuesList />
-      <CreateQues />
+      {/* <CreateQues /> */}
       
     </div>
   );
