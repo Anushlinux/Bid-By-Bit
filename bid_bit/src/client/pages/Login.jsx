@@ -25,7 +25,7 @@ export default function Login() {
   }, []);
 
   return (
-    <div className="flex flex-col bg-[#3e3e3e] text-white justify-center items-center h-screen gap-16 p-4">
+    <div className="flex flex-col bg-[#2e2e2e] text-white justify-center items-center h-screen gap-16 p-4">
       <div className="flex flex-col w-full h-44 items-center align-middle justify-end">
         <img src={CsiLogo} alt="CSI" className="h-36 w-36" />
       </div>
