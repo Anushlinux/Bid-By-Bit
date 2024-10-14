@@ -153,36 +153,57 @@ router.post("/:id/run", async (req, res) => {
   console.log("Response:", response.data);
 
   for (let i = 0; i < 10; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const status = await axios.get(
       `http://localhost:8000/jobs/${response.data.id}`,
     );
-    if (status.data.state == "COMPLETED") {
-      let data = [];
-      for (let j = 0; j < tasks.length; j++) {
-        let d = { id: j };
-        if (
-          status.data.execution[j].state == "COMPLETED" &&
-          status.data.execution[j].result.replace(/(?:\r\n|\r|\n)/g, "") ==
-            problem.testCases[j].expectedOutput.replace(/(?:\r\n|\r|\n)/g, "")
-        ) {
-          d["successful"] = true;
-        } else {
-          d["successful"] = false;
-        }
-        d["input"] = problem.testCases[j].input;
-        d["expectedOutput"] = problem.testCases[j].hidden
-          ? ""
-          : problem.testCases[j].expectedOutput;
-        d["output"] = status.data.execution[j].result;
-        d["hidden"] = problem.testCases[j].hidden;
-        data.push(d);
-      }
-      console.log("DATA:", data);
-      return res.status(200).json({ data });
-    } else if (status.data.state == "FAILED") {
-      return res.status(400).json(status.data);
+    let data = [];
+    if (status.data.state == "RUNNING") {
+      continue;
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    for (let j = 0; j < tasks.length; j++) {
+      let d = { id: j };
+      if (j >= status.data.execution.length) {
+        d["successful"] = false;
+        d["error"] = "Test case not executed";
+        d["hidden"] = problem.testCases[j].hidden;
+        if (!problem.testCases[j].hidden) {
+          d["input"] = problem.testCases[j].input;
+          d["expectedOutput"] = problem.testCases[j].expectedOutput;
+          d["output"] = "Test case not executed";
+        } else {
+          d["input"] = "Hidden";
+          d["expectedOutput"] = "Hidden";
+          d["output"] = "Hidden";
+        }
+        data.push(d);
+        continue;
+      }
+      if (
+        status.data.execution[j].state == "COMPLETED" &&
+        status.data.execution[j].result.replace(/(?:\r\n|\r|\n)/g, "") ==
+          problem.testCases[j].expectedOutput.replace(/(?:\r\n|\r|\n)/g, "")
+      ) {
+        d["successful"] = true;
+      } else {
+        d["successful"] = false;
+        d["error"] = status.data.execution[j].error;
+        console.log(status.data.execution[j]);
+      }
+      d["hidden"] = problem.testCases[j].hidden;
+      if (!problem.testCases[j].hidden) {
+        d["input"] = problem.testCases[j].input;
+        d["expectedOutput"] = problem.testCases[j].expectedOutput;
+        d["output"] = status.data.execution[j].result;
+      } else {
+        d["input"] = "HIDDEN";
+        d["expectedOutput"] = "HiDDEN";
+        d["output"] = "HIDDEN";
+      }
+      data.push(d);
+    }
+    console.log("DATA:", data);
+    return res.status(200).json({ data });
   }
 
   res.status(200).json({ error: "Timeout" });
