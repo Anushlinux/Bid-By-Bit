@@ -157,17 +157,28 @@ router.post("/:id/run", async (req, res) => {
       `http://localhost:8000/jobs/${response.data.id}`,
     );
     if (status.data.state == "COMPLETED") {
-      let successCount = 0;
+      let data = [];
       for (let j = 0; j < tasks.length; j++) {
+        let d = { id: j };
         if (
           status.data.execution[j].state == "COMPLETED" &&
           status.data.execution[j].result.replace(/(?:\r\n|\r|\n)/g, "") ==
             problem.testCases[j].expectedOutput.replace(/(?:\r\n|\r|\n)/g, "")
         ) {
-          successCount++;
+          d["successful"] = true;
+        } else {
+          d["successful"] = false;
         }
+        d["input"] = problem.testCases[j].input;
+        d["expectedOutput"] = problem.testCases[j].hidden
+          ? ""
+          : problem.testCases[j].expectedOutput;
+        d["output"] = status.data.execution[j].result;
+        d["hidden"] = problem.testCases[j].hidden;
+        data.push(d);
       }
-      return res.status(200).json({ successCount, total: tasks.length });
+      console.log("DATA:", data);
+      return res.status(200).json({ data });
     } else if (status.data.state == "FAILED") {
       return res.status(400).json(status.data);
     }
