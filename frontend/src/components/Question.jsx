@@ -2,23 +2,21 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const Question = () => {
-  const [problem, setProblem] = useState(null); // Initialize as null
-  const [loading, setLoading] = useState(true); // Set true by default
-  const [error, setError] = useState(null); // Initialize as null
+  const [problem, setProblem] = useState(null); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
 
   useEffect(() => {
     const fetchProblem = async () => {
       try {
         const response = await axios.get("http://localhost:4000/api/problems", {
           headers: {
-            // "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
         console.log(response.data);
 
         if (response.data && response.data.length > 0) {
-          // Assuming you want to fetch the first problem in the array
           setProblem(response.data[0]);
         } else {
           setProblem(null);
@@ -44,16 +42,22 @@ const Question = () => {
       className="mx-auto w-1/2 px-4 sm:px-6 lg:px-8"
       style={{
         width: "50vw",
-        height: "calc(84vh)",
+        height: "calc(87vh)",
         marginLeft: "auto",
         marginTop: "6rem",
         borderRadius: "10px",
         border: "1px solid ",
-        overflow: "hidden",
         backgroundColor: "#2e2e2e",
+        overflow: "hidden",
       }}
     >
-      <div className="mx-auto max-w-3xl mt-3">
+      <div
+        className="mx-auto max-w-3xl mt-3"
+        style={{
+          height: "100%", // Make sure this fills the container height
+          overflowY: "auto", // Enable vertical scrolling
+        }}
+      >
         <h1 className="text-4xl font-bold text-white mb-4">{problem.title}</h1>
         <div className="text-white mb-4">
           <strong></strong>{" "}
@@ -64,9 +68,6 @@ const Question = () => {
           <strong>Difficulty:</strong> {problem.difficulty}
         </div>
 
-        {/* Check if tags exist before rendering */}
-
-        {/* Check if testcases exist before rendering */}
         <div className="text-white">
           <strong>Test Cases:</strong>
           {problem.testcases && problem.testcases.length > 0 ? (
