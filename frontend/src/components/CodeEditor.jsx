@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 const CodeEditor = () => {
   const { id } = useParams();
   const [code, setCode] = useState("");
-  const [output, setOutput] = useState({});
+  const [output, setOutput] = useState();
   const [language, setLanguage] = useState(["C++", "cpp"]);
 
   const handleEditorChange = (value) => {
@@ -16,14 +16,37 @@ const CodeEditor = () => {
   };
 
   useEffect(() => {
-    console.log("Language changed to:", language);
-  }, [language]);
+    console.log(output);
+  }, [output]);
 
-  const handleSubmit = async () => {
+  const handleRun = async () => {
     console.log(JSON.stringify({ code, language: "python" }));
     try {
       const response = await axios.post(
         `http://localhost:4000/api/problems/${id}/run`,
+        {
+          code: code,
+          language: language[1],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        },
+      );
+      setOutput(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error executing code:", error);
+      setOutput("Error executing code");
+    }
+  };
+  const handleSubmit = async () => {
+    console.log(JSON.stringify({ code, language: "python" }));
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/problems/${id}/submit`,
         {
           code: code,
           language: language[1],
@@ -112,17 +135,22 @@ const CodeEditor = () => {
           }}
         >
           <button
-            onClick={handleSubmit}
-            className="run-code-button mr-2 text-white px-4 py-2 rounded hover:bg-blue-600"
-            style={{ backgroundColor: "#2e2e2e" }}
+            onClick={handleRun}
+            className="run-code-button mr-2 text-white px-4 py-2 rounded  bg-gray-500 hover:bg-gray-600"
           >
             Run Code
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="run-code-button mr-2 text-white px-4 py-2 rounded bg-green-500 hover:bg-green-600"
+          >
+            Submit
           </button>
         </div>
       </div>
       <div className="mt-2">
         <div className="text-lg font-semibold text-white">
-          <TestCases />
+          <TestCases output={output} />
         </div>
       </div>
     </div>
