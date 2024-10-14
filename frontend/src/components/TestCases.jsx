@@ -4,9 +4,10 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const TestCases = () => {
-  const [selectedCase, setSelectedCase] = useState(null); 
+  const [selectedCase, setSelectedCase] = useState(null);
   const [problem, setProblem] = useState(null);
-  const { id } = useParams(); 
+  const [testCaseResults, setTestCaseResults] = useState([]); // State to store test case results
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -17,7 +18,7 @@ const TestCases = () => {
           },
           baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
         });
-        setProblem(response.data); 
+        setProblem(response.data);
       } catch (error) {
         console.error("Error fetching problem:", error);
       }
@@ -28,12 +29,31 @@ const TestCases = () => {
   const handleCaseClick = (testCaseId) => {
     const selectedTestCase = problem.testCases.find(
       (tc) => tc._id === testCaseId
-    ); 
-    setSelectedCase(selectedTestCase); 
+    );
+    setSelectedCase(selectedTestCase);
   };
 
+  const fetchRunResults = async () => {
+    try {
+      const response = await axios.post(`/api/problems/:id/run`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
+        
+      });
+      setTestCaseResults(response.data); 
+    } catch (error) {
+      console.error("Error fetching test case results:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRunResults();
+  }, [id]);
+
   const handleClose = () => {
-    setSelectedCase(null); 
+    setSelectedCase(null);
   };
 
   return (
@@ -75,7 +95,7 @@ const TestCases = () => {
                   <strong>Input:</strong> {selectedCase.input}
                 </p>
                 <p>
-                  <strong>Output:</strong> {selectedCase.output}
+                  <strong>Output:</strong> {testCaseResults.output}
                 </p>
                 <p>
                   <strong>Expected:</strong> {selectedCase.expectedOutput}
@@ -85,15 +105,29 @@ const TestCases = () => {
           ) : (
             <div className="flex flex-col space-y-2">
               {problem?.testCases && problem.testCases.length > 0 ? (
-                problem.testCases.map((testCase) => (
+                problem.testCases.map((testCase, index) => (
                   <button
                     key={testCase._id}
                     onClick={() => handleCaseClick(testCase._id)}
                     className="flex justify-between items-center w-full px-4 py-2 text-white bg-gray-800 rounded-lg shadow-md hover:bg-gray-700"
                     style={{ backgroundColor: "#2e2e2e" }}
                   >
-                    <span>Test Case {testCase._id}</span>
-                    <span className="text-green-400">Passed</span>
+                    <div className="">
+                      <span>Test Case {testCase._id}</span>
+                      {/* <span>
+                        <strong>Output:</strong>{" "}
+                        {testCaseResults[index]?.output || "N/A"}
+                      </span> */}
+                    </div>
+                    <span
+                      className={`text-${
+                        testCaseResults[index]?.successful
+                          ? "green-400"
+                          : "red-400"
+                      }`}
+                    >
+                      {testCaseResults[index]?.successful ? "Passed" : "Failed"}
+                    </span>
                   </button>
                 ))
               ) : (

@@ -148,14 +148,14 @@ router.post("/:id/run", async (req, res) => {
       headers: {
         "Content-Type": "text/yaml",
       },
-    },
+    }
   );
   console.log("Response:", response.data);
 
   for (let i = 0; i < 10; i++) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const status = await axios.get(
-      `http://localhost:8000/jobs/${response.data.id}`,
+      `http://localhost:8000/jobs/${response.data.id}`
     );
     let data = [];
     if (status.data.state == "RUNNING") {
