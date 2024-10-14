@@ -22,6 +22,7 @@ const problemSchema = new Schema(
       {
         input: { type: String, required: true },
         expectedOutput: { type: String, required: true },
+        hidden: { type: Boolean, required: true },
       },
     ],
     constraints: [
