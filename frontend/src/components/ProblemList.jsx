@@ -31,12 +31,16 @@ export default function Component() {
 
   return (
     <div className="h-full text-white font-sans flex justify-center items-center rounded-lg">
-      <main className="p-6 w-full max-w-7xl">
+      <main
+        className="p-6 w-full max-w-7xl rounded-xl"
+        style={{ backgroundColor: "#1e1e1e" }}
+      >
         <div className="flex flex-wrap gap-4 justify-center">
           {challenges.map((challenge, index) => (
             <div
               key={index}
-              className="bg-gray-400/30 border border-white-1 p-4 rounded-lg flex flex-row justify-between w-full shadow-md hover:shadow-lg transition-shadow duration-300"
+              className=" p-4 rounded-lg flex flex-row justify-between w-full shadow-md hover:shadow-lg transition-shadow duration-300"
+              style={{ backgroundColor: "#2e2e2e" }}
             >
               <div className="flex flex-col justify-center">
                 <h2 className="font-semibold text-gray-100">
