@@ -39,7 +39,6 @@ const problemSchema = new Schema(
         explanation: { type: String },
       },
     ],
-    team: { type: Schema.Types.ObjectId, ref: "Team" },
   },
   { timestamps: true },
 );
