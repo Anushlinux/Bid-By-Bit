@@ -1,5 +1,5 @@
 import CodeEditor from "../components/CodeEditor";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import Question from "../components/Question";
 
 const Problem = () => {

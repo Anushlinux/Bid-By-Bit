@@ -1,5 +1,6 @@
 import { useState, Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { ArrowDown2 } from "iconsax-react";
 import axios from "axios";
 
 const statuses = {
@@ -14,7 +15,9 @@ function classNames(...classes) {
 
 export default function ProblemManagement() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [problems, setProblems] = useState([]);
+  const [expandedProblemId, setExpandedProblemId] = useState(null);
   const [formData, setFormData] = useState({
     problemTitle: "",
     problemDifficulty: "easy",
@@ -24,6 +27,15 @@ export default function ProblemManagement() {
     testCaseInput: "",
     testCaseOutput: "",
   });
+  const [editData, setEditData] = useState({
+    problemTitle: "",
+    problemDescription: "",
+    testCaseInput: "",
+    testCaseOutput: "",
+    teamName: "",
+  });
+
+  const dummyTeams = ["Team A", "Team B", "Team C"];
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -58,8 +70,36 @@ export default function ProblemManagement() {
     }));
   };
 
+  const handleEditChange = (e) => {
+    const { id, value } = e.target;
+    setEditData((prevState) => ({
+      ...prevState,
+      [id]: value,
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+  };
+
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    // Handle the edit submission logic here
+  };
+
+  const toggleExpand = (problemId) => {
+    setExpandedProblemId(expandedProblemId === problemId ? null : problemId);
+  };
+
+  const openEditModal = (problem) => {
+    setEditData({
+      problemTitle: problem.title,
+      problemDescription: problem.description,
+      testCaseInput: problem.testCases?.[0]?.input || "",
+      testCaseOutput: problem.testCases?.[0]?.expectedOutput || "",
+      teamName: "",
+    });
+    setIsEditOpen(true);
   };
 
   const inputStyle =
@@ -103,79 +143,76 @@ export default function ProblemManagement() {
                     {problem.status || "In progress"}
                   </p>
                 </div>
-                <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-400">
-                  <p className="whitespace-nowrap">
-                    Created on{" "}
-                    <time dateTime={problem.createdAt}>
-                      {new Date(problem.createdAt).toLocaleDateString()}
-                    </time>
-                  </p>
-                  <svg viewBox="0 0 2 2" className="h-0.5 w-0.5 fill-current">
-                    <circle cx={1} cy={1} r={1} />
-                  </svg>
-                  <p className="truncate">
-                    Created by {problem.createdBy || "Unknown"}
-                  </p>
-                </div>
+                <p className="mt-1 text-sm text-gray-300">
+                  {problem.description || "No description provided"}
+                </p>
               </div>
               <div className="flex flex-none items-center gap-x-4">
-                <a
-                  href={`#problem-${problem._id}`}
-                  className="hidden rounded-md px-2.5 py-1.5 text-sm font-semibold text-white shadow-s sm:block"
+                <button
+                  onClick={() => toggleExpand(problem._id)}
+                  className="rounded-md px-2.5 py-1.5 text-sm font-semibold text-white shadow-s"
                 >
-                  View Details
-                </a>
+                  <ArrowDown2 size="20" color="white" />
+                </button>
+                <button
+                  onClick={() => openEditModal(problem)}
+                  className="rounded-md px-2.5 py-1.5 text-sm font-semibold text-white shadow-s"
+                >
+                  Edit
+                </button>
               </div>
             </div>
 
-            <div className="mt-2 text-sm text-gray-300">
-              <p>
-                <strong>Difficulty:</strong>{" "}
-                {problem.difficulty || "Not specified"}
-              </p>
-              <p>
-                <strong>Description:</strong>{" "}
-                {problem.description || "No description provided"}
-              </p>
-              <p>
-                <strong>Tags:</strong>{" "}
-                {problem.tags ? problem.tags.join(", ") : "No tags"}
-              </p>
-              <p>
-                <strong>Example:</strong>
-              </p>
-              {problem.examples && problem.examples.length > 0 ? (
-                problem.examples.map((example, index) => (
-                  <div key={index} className="ml-4 mb-2">
-                    <p>{index + 1}. </p>
-                    <p>Input: {example.input || "Not specified"}</p>
-                    <p>Output: {example.output || "Not specified"}</p>
-                    <p>
-                      Explanation:{" "}
-                      {example.explanation || "No explanation provided"}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="ml-4">No examples provided</p>
-              )}
-              <p>
-                <strong>Testcases:</strong>
-              </p>
-              {problem.testCases && problem.testCases.length > 0 ? (
-                problem.testCases.map((testCase, index) => (
-                  <div key={testCase._id || index} className="ml-4">
-                    <p>Input: {testCase.input || "Not specified"}</p>
-                    <p>
-                      Expected Output:{" "}
-                      {testCase.expectedOutput || "Not specified"}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="ml-4">No test cases available</p>
-              )}
-            </div>
+            {expandedProblemId === problem._id && (
+              <div className="mt-2 text-sm text-gray-300">
+                <p>
+                  <strong>Difficulty:</strong>{" "}
+                  {problem.difficulty || "Not specified"}
+                </p>
+                <p>
+                  <strong>Description:</strong>{" "}
+                  {problem.description || "No description provided"}
+                </p>
+                <p>
+                  <strong>Tags:</strong>{" "}
+                  {problem.tags ? problem.tags.join(", ") : "No tags"}
+                </p>
+                <p>
+                  <strong>Example:</strong>
+                </p>
+                {problem.examples && problem.examples.length > 0 ? (
+                  problem.examples.map((example, index) => (
+                    <div key={index} className="ml-4 mb-2">
+                      <p>{index + 1}. </p>
+                      <p>Input: {example.input || "Not specified"}</p>
+                      <p>Output: {example.output || "Not specified"}</p>
+                      <p>
+                        Explanation:{" "}
+                        {example.explanation || "No explanation provided"}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="ml-4">No examples provided</p>
+                )}
+                <p>
+                  <strong>Testcases:</strong>
+                </p>
+                {problem.testCases && problem.testCases.length > 0 ? (
+                  problem.testCases.map((testCase, index) => (
+                    <div key={testCase._id || index} className="ml-4">
+                      <p>Input: {testCase.input || "Not specified"}</p>
+                      <p>
+                        Expected Output:{" "}
+                        {testCase.expectedOutput || "Not specified"}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="ml-4">No test cases available</p>
+                )}
+              </div>
+            )}
           </li>
         ))}
       </ul>
@@ -337,6 +374,149 @@ export default function ProblemManagement() {
                       <button
                         type="submit"
                         className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+                      >
+                        Submit Problem
+                      </button>
+                    </div>
+                  </form>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      <Transition appear show={isEditOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setIsEditOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full min-w-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className="w-full max-w-xl transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all"
+                  style={{ backgroundColor: "#1e1e1e" }}
+                >
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-white mb-4"
+                  >
+                    Edit Question
+                  </Dialog.Title>
+                  <form onSubmit={handleEditSubmit} className="space-y-4">
+                    <div className="flex flex-col flex-grow">
+                      <label
+                        htmlFor="editProblemTitle"
+                        className="text-white text-lg font-semibold mb-2"
+                      >
+                        Problem Title
+                      </label>
+                      <input
+                        id="editProblemTitle"
+                        type="text"
+                        value={editData.problemTitle}
+                        onChange={handleEditChange}
+                        className={inputStyle}
+                        style={{ backgroundColor: "#2e2e2e" }}
+                      />
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                      <label
+                        htmlFor="editProblemDescription"
+                        className="text-white text-lg font-semibold mb-2"
+                      >
+                        Problem Description
+                      </label>
+                      <textarea
+                        id="editProblemDescription"
+                        value={editData.problemDescription}
+                        onChange={handleEditChange}
+                        className={textareaStyle}
+                        style={{ backgroundColor: "#2e2e2e" }}
+                      ></textarea>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0">
+                      <div className="flex flex-col flex-grow">
+                        <label
+                          htmlFor="editTestCaseInput"
+                          className="text-white text-lg font-semibold mb-2"
+                        >
+                          Test Case Input
+                        </label>
+                        <input
+                          id="editTestCaseInput"
+                          type="text"
+                          value={editData.testCaseInput}
+                          onChange={handleEditChange}
+                          className={inputStyle}
+                          style={{ backgroundColor: "#2e2e2e" }}
+                        />
+                      </div>
+                      <div className="flex flex-col flex-grow">
+                        <label
+                          htmlFor="editTestCaseOutput"
+                          className="text-white text-lg font-semibold mb-2"
+                        >
+                          Test Case Output
+                        </label>
+                        <input
+                          id="editTestCaseOutput"
+                          type="text"
+                          value={editData.testCaseOutput}
+                          onChange={handleEditChange}
+                          className={inputStyle}
+                          style={{ backgroundColor: "#2e2e2e" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                      <label
+                        htmlFor="editTeamName"
+                        className="text-white text-lg font-semibold mb-2"
+                      >
+                        Team Name
+                      </label>
+                      <select
+                        id="editTeamName"
+                        value={editData.teamName}
+                        onChange={handleEditChange}
+                        className={inputStyle}
+                        style={{ backgroundColor: "#2e2e2e" }}
+                      >
+                        {dummyTeams.map((team, index) => (
+                          <option key={index} value={team}>
+                            {team}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="mt-4">
+                      <button
+                        type="submit"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px
+-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
                       >
                         Submit Problem
                       </button>

@@ -1,5 +1,5 @@
 // import CreateQues from '../components/createQues';
-import QuesList from "../components/AdminProbList";
+import AdminProbList from "../components/AdminProbList";
 
 export default function Admin() {
   return (
@@ -7,8 +7,7 @@ export default function Admin() {
       <div className="text-4xl font-bold text-white sm:truncate sm:text-5xl sm:tracking-tight pt-10 ml-12">
         Admin
       </div>
-      <QuesList />
-      {/* <CreateQues /> */}
+      <AdminProbList />
     </div>
   );
 }
