@@ -1,4 +1,3 @@
-// import CreateQues from '../components/createQues';
 import AdminProbList from "../components/AdminProbList";
 
 export default function Admin() {
