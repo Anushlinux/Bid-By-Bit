@@ -1,38 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TickSquare, CloseCircle } from "iconsax-react";
+import axios from "axios"; // Make sure you have imported axios
 
 const TestCases = () => {
   const [selectedCase, setSelectedCase] = useState(null);
+  const [problems, setProblems] = useState([]);
 
-  const testCases = [
-    {
-      id: 1,
-      input: "Input for Test Case 1",
-      output: "Output for Test Case 1",
-      expected: "Expected Output for Test Case 1",
-    },
-    {
-      id: 2,
-      input: "Input for Test Case 2",
-      output: "Output for Test Case 2",
-      expected: "Expected Output for Test Case 2",
-    },
-    {
-      id: 3,
-      input: "Input for Test Case 3",
-      output: "Output for Test Case 3",
-      expected: "Expected Output for Test Case 3",
-    },
-    {
-      id: 4,
-      input: "Input for Test Case 4",
-      output: "Output for Test Case 4",
-      expected: "Expected Output for Test Case 4",
-    },
-  ];
+  useEffect(() => {
+    const fetchProblems = async () => {
+      try {
+        const response = await axios.get("/api/problems", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
+        });
+        setProblems(response.data);
+      } catch (error) {
+        console.error("Error fetching problems:", error);
+      }
+    };
+    fetchProblems();
+  }, []);
 
-  const handleCaseClick = (caseId) => {
-    setSelectedCase(testCases.find((tc) => tc.id === caseId));
+  const handleCaseClick = (caseId, testCase) => {
+    setSelectedCase(testCase);
   };
 
   const handleClose = () => {
@@ -81,23 +73,25 @@ const TestCases = () => {
                   <strong>Output:</strong> {selectedCase.output}
                 </p>
                 <p>
-                  <strong>Expected:</strong> {selectedCase.expected}
+                  <strong>Expected:</strong> {selectedCase.expectedOutput}
                 </p>
               </div>
             </div>
           ) : (
             <div className="flex flex-col space-y-2">
-              {testCases.map((testCase) => (
-                <button
-                  key={testCase.id}
-                  onClick={() => handleCaseClick(testCase.id)}
-                  className="flex justify-between items-center w-full px-4 py-2 text-white bg-gray-800 rounded-lg shadow-md hover:bg-gray-700"
-                  style={{ backgroundColor: "#2e2e2e" }}
-                >
-                  <span>Test Case {testCase.id}</span>
-                  <span className="text-green-400">Passed</span>
-                </button>
-              ))}
+              {problems.map((problem, index) =>
+                problem.testCases.map((testCase, tcIndex) => (
+                  <button
+                    key={`${index}-${tcIndex}`}
+                    onClick={() => handleCaseClick(tcIndex, testCase)}
+                    className="flex justify-between items-center w-full px-4 py-2 text-white bg-gray-800 rounded-lg shadow-md hover:bg-gray-700"
+                    style={{ backgroundColor: "#2e2e2e" }}
+                  >
+                    <span>Test Case {tcIndex + 1}</span>
+                    <span className="text-green-400">Passed</span>
+                  </button>
+                ))
+              )}
             </div>
           )}
         </div>
