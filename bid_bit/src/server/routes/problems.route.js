@@ -9,9 +9,32 @@ import axios from "axios";
 const router = express.Router();
 router.use(authCheck);
 
-const images = {
-  javascript: "node:20-alpine",
-  python: "python:3.11-alpine",
+const languages = {
+  javascript: {
+    image: "node:20-alpine",
+    file: "index.js",
+    script: "node index.js < input.txt > $TORK_OUTPUT",
+  },
+  python: {
+    image: "python:3.11-alpine",
+    file: "main.py",
+    script: "python3 main.py < input.txt > $TORK_OUTPUT",
+  },
+  cpp: {
+    image: "gcc:14.2.0",
+    file: "main.cpp",
+    script: "gcc main.cpp -o main && ./main < input.txt > $TORK_OUTPUT",
+  },
+  c: {
+    image: "gcc:14.2.0",
+    file: "main.c",
+    script: "gcc main.c -o main && ./main < input.txt > $TORK_OUTPUT",
+  },
+  java: {
+    image: "eclipse-temurin:23_37-jdk-alpine",
+    file: "Main.java",
+    script: "javac Main.java && java Main < input.txt > $TORK_OUTPUT",
+  },
 };
 
 router.post("/", async (req, res) => {
@@ -88,21 +111,35 @@ router.put("/:id", async (req, res) => {
 router.post("/:id/run", async (req, res) => {
   const user = req.user;
   const problemId = req.params.id;
+  const problem = await Problem.findById(problemId);
   const code = req.body.code;
   const language = req.body.language;
+  const f = {};
+  f[languages[language].file] = code;
+  const tasks = [];
+
+  problem.testCases.forEach((testCase, index) => {
+    const t = {
+      name: `testcase-${index}`,
+      image: languages[language].image,
+      files: {
+        ...f,
+        "input.txt": testCase.input,
+      },
+      run: languages[language].script,
+      limits: {
+        cpus: "1",
+        memory: "512m",
+      },
+      timeout: "30s",
+    };
+    tasks.push(t);
+  });
   const job = {
     name: `${problemId}-${user._id}`,
-    tasks: [
-      {
-        name: `testcase-1`,
-        image: images[language],
-        files: {
-          "index.js": code,
-        },
-        run: "node index.js > $TORK_OUTPUT",
-      },
-    ],
+    tasks,
   };
+  console.log("Job:", job);
   const response = await axios.post(
     "http://localhost:8000/jobs",
     JSON.stringify(job),
@@ -112,6 +149,31 @@ router.post("/:id/run", async (req, res) => {
       },
     },
   );
+  console.log("Response:", response.data);
+
+  for (let i = 0; i < 10; i++) {
+    const status = await axios.get(
+      `http://localhost:8000/jobs/${response.data.id}`,
+    );
+    if (status.data.state == "COMPLETED") {
+      let successCount = 0;
+      for (let j = 0; j < tasks.length; j++) {
+        if (
+          status.data.execution[j].state == "COMPLETED" &&
+          status.data.execution[j].result.replace(/(?:\r\n|\r|\n)/g, "") ==
+            problem.testCases[j].expectedOutput.replace(/(?:\r\n|\r|\n)/g, "")
+        ) {
+          successCount++;
+        }
+      }
+      return res.status(200).json({ successCount, total: tasks.length });
+    } else if (status.data.state == "FAILED") {
+      return res.status(400).json(status.data);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  res.status(200).json({ error: "Timeout" });
 });
 
 router.post("/:id/submit", (req, res) => {

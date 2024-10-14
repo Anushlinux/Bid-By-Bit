@@ -9,7 +9,12 @@ const Question = () => {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/problems");
+        const response = await axios.get("http://localhost:4000/api/problems", {
+          headers: {
+            // "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
         console.log(response.data);
 
         if (response.data && response.data.length > 0) {

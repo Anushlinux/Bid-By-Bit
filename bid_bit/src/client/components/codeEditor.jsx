@@ -6,7 +6,7 @@ import Dropdown from "../assets/dropdown";
 const CodeEditor = () => {
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
-  const [language, setLanguage] = useState("javascript");
+  const [language, setLanguage] = useState("python");
 
   const handleEditorChange = (value) => {
     setCode(value);
@@ -17,12 +17,24 @@ const CodeEditor = () => {
   };
 
   const handleSubmit = async () => {
+    console.log(JSON.stringify({ code, language: "python" }));
     try {
-      const response = await axios.post("http://localhost:4000/api/execute", {
-        code: code,
-        language: "javascript",
-      });
-      setOutput(response.data.output);
+      const response = await axios.post(
+        "http://localhost:4000/api/problems/6702a3e00e9792281a770be7/run",
+        {
+          code: code,
+          language: "python",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        },
+      );
+      setOutput(
+        `${response.data.successCount}/${response.data.total} test cases passed`,
+      );
     } catch (error) {
       console.error("Error executing code:", error);
       setOutput("Error executing code");
