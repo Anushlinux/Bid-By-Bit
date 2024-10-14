@@ -17,7 +17,7 @@ const router = createBrowserRouter(
     <Route path="/">
       <Route Component={Protected}>
         <Route index Component={Home} />
-        <Route path="problem/:id" Component={Problem} />
+        <Route path="problem/:id" Component={Problem} />You can provide a way better UX than this when your app throws errors by providing your own ErrorBoundary or errorElement prop on your route.
         <Route path="admin" Component={Admin} />
       </Route>
       <Route path="login" Component={Login} />
