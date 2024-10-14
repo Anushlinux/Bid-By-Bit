@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
-import Dropdown from "../components/dropdown";
+import Dropdown from "../components/Dropdown";
 import TestCases from "../components/TestCases";
 import { useParams } from "react-router-dom";
 
@@ -9,15 +9,15 @@ const CodeEditor = () => {
   const { id } = useParams();
   const [code, setCode] = useState("");
   const [output, setOutput] = useState({});
-  const [language, setLanguage] = useState("python");
+  const [language, setLanguage] = useState(["C++", "cpp"]);
 
   const handleEditorChange = (value) => {
     setCode(value);
   };
 
-  const handleLanguageChange = (event) => {
-    setLanguage(event.target.value);
-  };
+  useEffect(() => {
+    console.log("Language changed to:", language);
+  }, [language]);
 
   const handleSubmit = async () => {
     console.log(JSON.stringify({ code, language: "python" }));
@@ -26,7 +26,7 @@ const CodeEditor = () => {
         `http://localhost:4000/api/problems/${id}/run`,
         {
           code: code,
-          language: "python",
+          language: language[1],
         },
         {
           headers: {
@@ -88,12 +88,12 @@ const CodeEditor = () => {
           Code
         </div>
         <div className="px-2" style={{ backgroundColor: "#1e1e1e" }}>
-          <Dropdown />
+          <Dropdown language={language} setLanguage={setLanguage} />
         </div>
         <div className="h-0 w-full border-t border-gray-600"></div>
         <Editor
           height="400px"
-          language={language}
+          language={language[1]}
           value={code}
           onChange={handleEditorChange}
           theme="vs-dark"

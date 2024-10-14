@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+// import { Fragment } from "react";
 import {
   Menu,
   MenuButton,
@@ -12,7 +12,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Dropdown() {
+export default function Dropdown({ language, setLanguage }) {
   return (
     <div className="overflow-visible">
       <Menu
@@ -22,7 +22,7 @@ export default function Dropdown() {
       >
         <div>
           <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md  px-3 py-2 text-lg font-semibold text-gray-400 hover:text-gray-200 ">
-            C++
+            {language[0]}
             <ChevronDownIcon
               className="-mr-1 mt-1 h-5 w-5 text-gray-400"
               aria-hidden="true"
@@ -44,68 +44,68 @@ export default function Dropdown() {
           >
             <div className="py-1">
               <MenuItem>
-                {({ selected }) => (
-                  <a
-                    href="#"
+                {({ focus }) => (
+                  <button
+                    onClick={() => setLanguage(["C++", "cpp"])}
                     className={classNames(
-                      selected ? "bg-gray-700 text-gray-100" : "text-gray-100",
-                      "block px-4 py-2 text-md"
+                      focus ? "bg-gray-700 text-gray-100" : "text-gray-100",
+                      "block px-4 py-2 text-md w-full text-left",
                     )}
                   >
                     C++
-                  </a>
+                  </button>
                 )}
               </MenuItem>
               <MenuItem>
                 {({ focus }) => (
-                  <a
-                    href="#"
+                  <button
+                    onClick={() => setLanguage(["C", "c"])}
                     className={classNames(
                       focus ? "bg-gray-700 text-gray-100" : "text-gray-100",
-                      "block px-4 py-2 text-md"
+                      "block px-4 py-2 text-md  w-full text-left",
                     )}
                   >
                     C
-                  </a>
+                  </button>
                 )}
               </MenuItem>
               <MenuItem>
                 {({ focus }) => (
-                  <a
-                    href="#"
+                  <button
+                    onClick={() => setLanguage(["Java", "java"])}
                     className={classNames(
                       focus ? "bg-gray-700 text-gray-100" : "text-gray-100",
-                      "block px-4 py-2 text-md"
+                      "block px-4 py-2 text-md  w-full text-left",
                     )}
                   >
                     Java
-                  </a>
+                  </button>
                 )}
               </MenuItem>
               <MenuItem>
                 {({ focus }) => (
-                  <a
-                    href="#"
+                  <button
+                    onClick={() => setLanguage(["Python", "python"])}
                     className={classNames(
                       focus ? "bg-gray-700 text-gray-100" : "text-gray-100",
-                      "block px-4 py-2 text-md"
+                      "block px-4 py-2 text-md w-full text-left",
                     )}
                   >
                     Python
-                  </a>
+                  </button>
                 )}
               </MenuItem>
               <MenuItem>
                 {({ focus }) => (
-                  <a
-                    href="#"
+                  <button
+                    onClick={() => setLanguage(["Javascript", "javascript"])}
                     className={classNames(
                       focus ? "bg-gray-700 text-gray-100" : "text-gray-100",
-                      "block px-4 py-2 text-md"
+                      "block px-4 py-2 text-md w-full text-left",
                     )}
                   >
                     Javascript
-                  </a>
+                  </button>
                 )}
               </MenuItem>
             </div>
