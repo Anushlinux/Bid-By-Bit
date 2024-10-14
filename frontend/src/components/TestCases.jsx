@@ -4,9 +4,9 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const TestCases = () => {
-  const [selectedCase, setSelectedCase] = useState(null); 
+  const [selectedCase, setSelectedCase] = useState(null);
   const [problem, setProblem] = useState(null);
-  const { id } = useParams(); 
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -17,7 +17,7 @@ const TestCases = () => {
           },
           baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
         });
-        setProblem(response.data); 
+        setProblem(response.data);
       } catch (error) {
         console.error("Error fetching problem:", error);
       }
@@ -27,13 +27,13 @@ const TestCases = () => {
 
   const handleCaseClick = (testCaseId) => {
     const selectedTestCase = problem.testCases.find(
-      (tc) => tc._id === testCaseId
-    ); 
-    setSelectedCase(selectedTestCase); 
+      (tc) => tc._id === testCaseId,
+    );
+    setSelectedCase(selectedTestCase);
   };
 
   const handleClose = () => {
-    setSelectedCase(null); 
+    setSelectedCase(null);
   };
 
   return (

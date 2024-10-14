@@ -37,6 +37,12 @@ const languages = {
   },
 };
 
+const rewards = {
+  Easy: 80,
+  Medium: 120,
+  Hard: 160,
+};
+
 router.post("/", async (req, res) => {
   if (req.user.role != "ADMIN") {
     return res.status(403).json({ error: "Forbidden" });
@@ -107,6 +113,117 @@ router.put("/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+router.post("/:id/submit", async (req, res) => {
+  const user = req.user;
+  const problemId = req.params.id;
+  const problem = await Problem.findById(problemId);
+  const code = req.body.code;
+  const language = req.body.language;
+  const f = {};
+  f[languages[language].file] = code;
+  const tasks = [];
+
+  problem.testCases.forEach((testCase, index) => {
+    const t = {
+      name: `testcase-${index}`,
+      image: languages[language].image,
+      files: {
+        ...f,
+        "input.txt": testCase.input,
+      },
+      run: languages[language].script,
+      limits: {
+        cpus: "1",
+        memory: "512m",
+      },
+      timeout: "30s",
+    };
+    tasks.push(t);
+  });
+  const job = {
+    name: `${problemId}-${user._id}`,
+    tasks,
+  };
+  console.log("Job:", job);
+  const response = await axios.post(
+    "http://localhost:8000/jobs",
+    JSON.stringify(job),
+    {
+      headers: {
+        "Content-Type": "text/yaml",
+      },
+    },
+  );
+  console.log("Response:", response.data);
+
+  for (let i = 0; i < 10; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const status = await axios.get(
+      `http://localhost:8000/jobs/${response.data.id}`,
+    );
+    let data = [];
+    if (status.data.state == "RUNNING") {
+      continue;
+    }
+    let successCount = 0;
+    const totalCount = tasks.length;
+
+    for (let j = 0; j < tasks.length; j++) {
+      let d = { id: j };
+      if (j >= status.data.execution.length) {
+        d["successful"] = false;
+        d["error"] = "Test case not executed";
+        d["hidden"] = problem.testCases[j].hidden;
+        if (!problem.testCases[j].hidden) {
+          d["input"] = problem.testCases[j].input;
+          d["expectedOutput"] = problem.testCases[j].expectedOutput;
+          d["output"] = "Test case not executed";
+        } else {
+          d["input"] = "Hidden";
+          d["expectedOutput"] = "Hidden";
+          d["output"] = "Hidden";
+        }
+        data.push(d);
+        continue;
+      }
+      if (
+        status.data.execution[j].state == "COMPLETED" &&
+        status.data.execution[j].result.replace(/(?:\r\n|\r|\n)/g, "") ==
+          problem.testCases[j].expectedOutput.replace(/(?:\r\n|\r|\n)/g, "")
+      ) {
+        d["successful"] = true;
+        successCount++;
+      } else {
+        d["successful"] = false;
+        d["error"] = status.data.execution[j].error;
+        console.log(status.data.execution[j]);
+      }
+      d["hidden"] = problem.testCases[j].hidden;
+      if (!problem.testCases[j].hidden) {
+        d["input"] = problem.testCases[j].input;
+        d["expectedOutput"] = problem.testCases[j].expectedOutput;
+        d["output"] = status.data.execution[j].result;
+      } else {
+        d["input"] = "HIDDEN";
+        d["expectedOutput"] = "HiDDEN";
+        d["output"] = "HIDDEN";
+      }
+      data.push(d);
+    }
+    console.log("DATA:", data);
+    if (successCount == totalCount) {
+      problem.solved = true;
+      await problem.save();
+    } else {
+      req.user.team.wrongSubmissions++;
+      await req.user.team.save();
+    }
+    return res.status(200).json({ data });
+  }
+
+  res.status(200).json({ error: "Timeout" });
 });
 
 router.post("/:id/run", async (req, res) => {
@@ -207,13 +324,6 @@ router.post("/:id/run", async (req, res) => {
   }
 
   res.status(200).json({ error: "Timeout" });
-});
-
-router.post("/:id/submit", (req, res) => {
-  const user = req.user;
-  const problemId = req.params.id;
-  const code = req.body.code;
-  const language = req.body.language;
 });
 
 router.post("/:id/allocate", adminCheck, async (req, res) => {

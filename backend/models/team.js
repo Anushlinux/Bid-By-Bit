@@ -22,7 +22,7 @@ const teamSchema = new Schema({
     type: Number,
     default: 0,
   },
-  submissions: {
+  wrongSubmissions: {
     type: Number,
     default: 0,
   },
