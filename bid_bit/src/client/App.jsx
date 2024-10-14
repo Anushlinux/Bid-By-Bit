@@ -4,7 +4,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-import Playground from "./pages/code";
+import Playground from "./pages/code.jsx";
 import Home from "./pages/Home.jsx";
 import React from "react";
 import Login from "./pages/Login.jsx";
