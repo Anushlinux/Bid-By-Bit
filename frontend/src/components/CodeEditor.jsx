@@ -76,16 +76,17 @@ const CodeEditor = () => {
           borderRadius: "10px",
           border: "1px solid ",
           overflow: "hidden",
+          position: "relative",
         }}
       >
         <div
-          className="font-sans text-xl text-white py-2 px-4 "
+          className="font-sans text-xl text-white py-2 px-4"
           style={{ backgroundColor: "#2e2e2e" }}
         >
           <span className="text-green-500">{`</> `}</span>
           Code
         </div>
-        <div className="px-2 " style={{ backgroundColor: "#1e1e1e" }}>
+        <div className="px-2" style={{ backgroundColor: "#1e1e1e" }}>
           <Dropdown />
         </div>
         <div className="h-0 w-full border-t border-gray-600"></div>
@@ -102,25 +103,26 @@ const CodeEditor = () => {
           beforeMount={handleEditorWillMount}
           onMount={handleEditorDidMount}
         />
-      </div>
-      {/* <div className="bg-gray-100 mt-50 p-4" style={{ backgroundColor: "#1e1e1e" }}>
+        <div
+          style={{
+            position: "absolute",
+            bottom: "10px",
+            right: "10px",
+          }}
+        >
           <button
             onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="run-code-button mr-2 text-white px-4 py-2 rounded hover:bg-blue-600"
+            style={{ backgroundColor: "#2e2e2e" }}
           >
             Run Code
           </button>
-        </div> */}
-      <div className="mt-2 ">
+        </div>
+      </div>
+      <div className="mt-2">
         <div className="text-lg font-semibold text-white">
           <TestCases />
         </div>
-        {/* <pre
-          className="bg-gray-100 text-white p-4 rounded-lg whitespace-pre-wrap"
-          style={{ backgroundColor: "#1e1e1e" }}
-        >
-          {output}
-        </pre> */}
       </div>
     </div>
   );
