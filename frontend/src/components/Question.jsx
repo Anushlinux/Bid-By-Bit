@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 
 const Question = () => {
   const { id } = useParams();
@@ -35,7 +36,7 @@ const Question = () => {
     };
 
     fetchProblem();
-  }, []);
+  }, [id]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -56,7 +57,7 @@ const Question = () => {
       }}
     >
       <div
-        className="mx-auto max-w-3xl mt-3"
+        className="mx-auto max-w-3xl py-3"
         style={{
           height: "100%", // Make sure this fills the container height
           overflowY: "auto", // Enable vertical scrolling
@@ -67,7 +68,9 @@ const Question = () => {
           <strong></strong>{" "}
           {problem.tags ? problem.tags.join(", ") : "No tags available"}
         </div>
-        <p className="text-white text-xl mb-4">{problem.description}</p>
+        <ReactMarkdown className="text-white  mb-4">
+          {problem.description}
+        </ReactMarkdown>
         <div className="text-white mb-4">
           <strong>Difficulty:</strong> {problem.difficulty}
         </div>
