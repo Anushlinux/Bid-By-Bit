@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
-import Dropdown from "../components/dropdown";
+import Dropdown from "../components/Dropdown";
 import TestCases from "../components/TestCases";
 
 const CodeEditor = () => {
@@ -31,10 +31,10 @@ const CodeEditor = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
-        }
+        },
       );
       setOutput(
-        `${response.data.successCount}/${response.data.total} test cases passed`
+        `${response.data.successCount}/${response.data.total} test cases passed`,
       );
     } catch (error) {
       console.error("Error executing code:", error);
