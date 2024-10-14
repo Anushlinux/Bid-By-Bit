@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
-import Dropdown from "../components/Dropdown";
+import Dropdown from "../components/dropdown";
+import TestCases from "../components/TestCases";
 
 const CodeEditor = () => {
   const [code, setCode] = useState("");
@@ -30,10 +31,10 @@ const CodeEditor = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
-        },
+        }
       );
       setOutput(
-        `${response.data.successCount}/${response.data.total} test cases passed`,
+        `${response.data.successCount}/${response.data.total} test cases passed`
       );
     } catch (error) {
       console.error("Error executing code:", error);
@@ -69,7 +70,7 @@ const CodeEditor = () => {
       <div
         style={{
           width: "48vw",
-          height: "calc(84vh)",
+          height: "calc(54vh)",
           marginLeft: "auto",
           marginTop: "6rem",
           borderRadius: "10px",
@@ -98,26 +99,28 @@ const CodeEditor = () => {
             minimap: { enabled: false },
             fontSize: 14,
           }}
-          beforeMount={handleEditorWillMount} // Called before the editor is mounted
+          beforeMount={handleEditorWillMount}
           onMount={handleEditorDidMount}
         />
-        <div className="bg-gray-100 p-4" style={{ backgroundColor: "#1e1e1e" }}>
+      </div>
+      {/* <div className="bg-gray-100 mt-50 p-4" style={{ backgroundColor: "#1e1e1e" }}>
           <button
             onClick={handleSubmit}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
             Run Code
           </button>
+        </div> */}
+      <div className="mt-2 ">
+        <div className="text-lg font-semibold text-white">
+          <TestCases />
         </div>
-      </div>
-      <div className="-mt-20">
-        <h3 className="text-lg font-semibold text-white">Output:</h3>
-        <pre
+        {/* <pre
           className="bg-gray-100 text-white p-4 rounded-lg whitespace-pre-wrap"
           style={{ backgroundColor: "#1e1e1e" }}
         >
           {output}
-        </pre>
+        </pre> */}
       </div>
     </div>
   );

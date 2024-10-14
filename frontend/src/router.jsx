@@ -3,6 +3,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
+import React from "react";
 
 import Protected from "./layouts/Protected.jsx";
 
