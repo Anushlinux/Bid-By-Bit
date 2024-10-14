@@ -1,25 +1,16 @@
 import express from "express";
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
-import axios from "axios";
-import crypto from "crypto";
-import jwt from "jsonwebtoken";
-// import dotenv from "dotenv";
 import cors from "cors";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import session from "express-session";
 
 import User from "./models/user.js";
-import Team from "./models/team.js";
-import Problem from "./models/problem.js";
 
 import authRoutes from "./routes/auth.route.js";
 import problemsRoutes from "./routes/problems.route.js";
 import teamsRoutes from "./routes/teams.route.js";
 import userRouter from "./routes/user.route.js";
-
-// dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -49,10 +40,6 @@ mongoose
 mongoose.connection.on("error", (err) => {
   console.error("MongoDB connection error:", err);
 });
-
-//github auth
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 passport.use(
   new GoogleStrategy(
@@ -108,146 +95,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemsRoutes);
 app.use("/api/teams", teamsRoutes);
 app.use("/api/user", userRouter);
-
-// Protected route to get user details
-// app.get("/api/user", verifyToken, async (req, res) => {
-//   try {
-//     // Fetch user details using decoded token
-//     const user = await User.findOne({ email: req.user.email });
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-//     res.status(200).json({ username: user.username, email: user.email });
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
-// // Create a new problem (Admins only)
-// app.post("/api/problems", verifyToken, adminCheck, async (req, res) => {
-//   try {
-//     const problem = new Problem({
-//       title: req.body.title,
-//       description: req.body.description,
-//       difficulty: req.body.difficulty,
-//       tags: req.body.tags,
-//       testCases: req.body.testCases,
-//       createdBy: req.user._id,
-//     });
-
-//     await problem.save();
-//     res.status(201).json(problem);
-//   } catch (error) {
-//     console.error("Error creating problem:", error);
-//     res
-//       .status(500)
-//       .json({ error: "Internal server error", details: error.message });
-//   }
-// });
-
-// Get all problems
-// app.get("/api/problems", async (req, res) => {
-//   try {
-//     const problems = await Problem.find();
-//     res.status(200).json(problems);
-//   } catch (error) {
-//     console.error("Error fetching problems:", error);
-//     res
-//       .status(500)
-//       .json({ error: "Internal server error", details: error.message });
-//   }
-// });
-
-// app.get("/api/problems/:id", async (req, res) => {
-//   try {
-//     const problem = await Problem.findById(req.params.id);
-//     if (!problem) {
-//       return res.status(404).json({ error: "Problem not found" });
-//     }
-//     res.status(200).json(problem);
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
-// // Update a problem (Admins only)
-// app.put("/api/problems/:id", verifyToken, adminCheck, async (req, res) => {
-//   try {
-//     const problem = await Problem.findByIdAndUpdate(
-//       req.params.id,
-//       {
-//         title: req.body.title,
-//         description: req.body.description,
-//         difficulty: req.body.difficulty,
-//         tags: req.body.tags,
-//         testCases: req.body.testCases,
-//       },
-//       { new: true },
-//     );
-
-//     if (!problem) {
-//       return res.status(404).json({ error: "Problem not found" });
-//     }
-
-//     res.status(200).json(problem);
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
-// // Delete a problem (Admins only)
-// app.delete("/api/problems/:id", verifyToken, adminCheck, async (req, res) => {
-//   try {
-//     const problem = await Problem.findByIdAndDelete(req.params.id);
-//     if (!problem) {
-//       return res.status(404).json({ error: "Problem not found" });
-//     }
-//     res.status(200).json({ message: "Problem deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
-// app.post("/api/execute", async (req, res) => {
-//   const { code, language } = req.body;
-
-//   try {
-//     // Make a request to the Go service running on port 9000
-//     // const response = await axios.post("http://localhost:8000/api/execute", {
-//     //   code: code,
-//     //   language: language,
-//     // });
-//     console.log(typeof code);
-//     const job = {
-//       name: "Sample job",
-//       tasks: [
-//         {
-//           name: "Task 1",
-//           image: "node:20-alpine",
-//           files: {
-//             "index.js": code,
-//           },
-//           run: "node index.js > $TORK_OUTPUT",
-//         },
-//       ],
-//     };
-//     console.log(job);
-//     const response = await axios.post(
-//       "http://localhost:8000/jobs",
-//       JSON.stringify(job),
-//       {
-//         headers: {
-//           "Content-Type": "text/yaml",
-//         },
-//       },
-//     );
-//     // Send the response back to the client
-//     res.status(200).json(response.data);
-//   } catch (error) {
-//     console.error("Error calling Go service:", error.message);
-//     res.status(500).json({ message: "Error executing code" });
-//   }
-// });
 
 app.get("/", async (req, res) => {
   res.send("Welcome to my User Registration and Login API!");

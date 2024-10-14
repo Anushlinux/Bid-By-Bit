@@ -18,6 +18,14 @@ const teamSchema = new Schema({
       ref: "User",
     },
   ],
+  score: {
+    type: Number,
+    default: 0,
+  },
+  submissions: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Team = model("Team", teamSchema);
