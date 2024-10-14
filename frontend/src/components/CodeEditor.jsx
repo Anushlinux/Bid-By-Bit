@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 import Dropdown from "../components/dropdown";
 import TestCases from "../components/TestCases";
+import { useParams } from "react-router-dom";
 
 const CodeEditor = () => {
+  const { id } = useParams();
   const [code, setCode] = useState("");
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState({});
   const [language, setLanguage] = useState("python");
 
   const handleEditorChange = (value) => {
@@ -21,7 +23,7 @@ const CodeEditor = () => {
     console.log(JSON.stringify({ code, language: "python" }));
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/problems/6702a3e00e9792281a770be7/run",
+        `http://localhost:4000/api/problems/${id}/run`,
         {
           code: code,
           language: "python",
@@ -31,11 +33,10 @@ const CodeEditor = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
-        }
+        },
       );
-      setOutput(
-        `${response.data.successCount}/${response.data.total} test cases passed`
-      );
+      setOutput(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error executing code:", error);
       setOutput("Error executing code");

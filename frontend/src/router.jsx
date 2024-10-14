@@ -3,7 +3,6 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-import React from "react";
 
 import Protected from "./layouts/Protected.jsx";
 
@@ -18,7 +17,7 @@ const router = createBrowserRouter(
     <Route path="/">
       <Route Component={Protected}>
         <Route index Component={Home} />
-        <Route path="problem" Component={Problem} />
+        <Route path="problem/:id" Component={Problem} />
         <Route path="admin" Component={Admin} />
       </Route>
       <Route path="login" Component={Login} />

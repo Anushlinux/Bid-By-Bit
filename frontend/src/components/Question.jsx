@@ -1,23 +1,27 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const Question = () => {
-  const [problem, setProblem] = useState(null); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null); 
+  const { id } = useParams();
+  const [problem, setProblem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/problems", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        const response = await axios.get(
+          "http://localhost:4000/api/problems/" + id,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
           },
-        });
-        console.log(response.data);
+        );
 
-        if (response.data && response.data.length > 0) {
-          setProblem(response.data[0]);
+        if (response.data) {
+          setProblem(response.data);
         } else {
           setProblem(null);
         }

@@ -17,7 +17,7 @@ async function authCheck(req, res, next) {
     let user = await User.findById(decoded.user_id);
     if (user) {
       if (user.team) {
-        user.team = await Team.findById(user.team);
+        user.team = await Team.findById(user.team).populate("members");
       }
       req.user = user;
     } else {

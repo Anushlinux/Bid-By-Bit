@@ -39,6 +39,7 @@ const problemSchema = new Schema(
         explanation: { type: String },
       },
     ],
+    solved: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

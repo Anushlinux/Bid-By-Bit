@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect, useContext } from "react";
 import ProblemList from "../components/ProblemList";
 import Leaderboard from "../components/Leaderboard";
 
+import UserDataContext from "../contexts/UserDataContext";
+
 export default function Home() {
-  const [teamName, setTeamName] = useState("hairfall ke 14");
-  const [teamMembers, setTeamMembers] = useState(["bitch", "ass", "nigga"]);
+  const { userData } = useContext(UserDataContext);
 
   useEffect(() => {
     // Omit or comment the API fetch call for now
@@ -21,11 +22,19 @@ export default function Home() {
     // fetchTeamData();
   }, []);
 
+  if (!userData) {
+    return <></>;
+  }
+
   return (
     <div className="min-h-screen flex flex-col w-full dark:bg-black bg-white dark:bg-grid-small-white/[0.5] bg-grid-black/[0.2] overflow-hidden">
       <div className="px-14 py-8">
-        <p className="text-3xl text-white font-bold">Welcome Team {teamName}</p>
-        <p className="text-xl text-white">{teamMembers.join(", ")}</p>
+        <p className="text-3xl text-white font-bold">
+          Welcome {userData.team.name}
+        </p>
+        <p className="text-xl text-white">
+          {userData.team.members.map((mem) => mem.name).join(", ")}
+        </p>
       </div>
       <div className="flex flex-1 flex-col md:flex-row gap-20 px-6">
         <ProblemList />
