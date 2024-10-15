@@ -13,14 +13,12 @@ const Question = () => {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4000/api/problems/" + id,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
+        const response = await axios.get("/api/problems/" + id, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
-        );
+          baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
+        });
 
         if (response.data) {
           setProblem(response.data);
