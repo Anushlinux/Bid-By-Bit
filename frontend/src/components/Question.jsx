@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm"; // Import this if you need GitHub flavored markdown
+import remarkGfm from "remark-gfm";
 
 const Question = () => {
   const { id } = useParams();
@@ -57,8 +57,8 @@ const Question = () => {
         <div
           className="mx-auto max-w-3xl py-3"
           style={{
-            height: "100%", // Make sure this fills the container height
-            overflowY: "auto", // Enable vertical scrolling
+            height: "100%",
+            overflowY: "auto",
           }}
         >
           <h1 className="text-4xl font-bold text-white mb-4 bg-gray-700 h-10 w-3/4"></h1>
@@ -108,8 +108,8 @@ const Question = () => {
       <div
         className="mx-auto max-w-3xl py-3"
         style={{
-          height: "100%", // Make sure this fills the container height
-          overflowY: "auto", // Enable vertical scrolling
+          height: "100%",
+          overflowY: "auto",
         }}
       >
         <h1 className="text-4xl font-bold text-white mb-4">{problem.title}</h1>
