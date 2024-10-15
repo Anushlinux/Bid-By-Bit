@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm"; // To support tables, task lists, etc.
+import rehypeRaw from "rehype-raw"; // To handle raw HTML in markdown
+import remarkBreaks from "remark-breaks"; // For handling line breaks '\n'
 
 const Question = () => {
   const { id } = useParams();
@@ -18,7 +21,7 @@ const Question = () => {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
-          },
+          }
         );
 
         if (response.data) {
@@ -65,51 +68,71 @@ const Question = () => {
       >
         <h1 className="text-4xl font-bold text-white mb-4">{problem.title}</h1>
         <div className="text-white mb-4">
-          <strong></strong>{" "}
+          <strong>Tags:</strong>{" "}
           {problem.tags ? problem.tags.join(", ") : "No tags available"}
         </div>
-        <ReactMarkdown className="text-white  mb-4">
+
+        <ReactMarkdown
+          className="prose prose-lg text-white mb-4" // Use Tailwind CSS's typography plugin or custom styles for markdown
+          remarkPlugins={[remarkGfm, remarkBreaks]} // Enable GitHub flavored markdown and handle line breaks
+          rehypePlugins={[rehypeRaw]} // Enable raw HTML parsing in markdown
+        >
           {problem.description}
         </ReactMarkdown>
+
         <div className="text-white mb-4">
           <strong>Difficulty:</strong> {problem.difficulty}
         </div>
 
-        <div className="text-white">
+        <div className="text-white mb-4">
           <strong>Test Cases:</strong>
           {problem.testcases && problem.testcases.length > 0 ? (
             <ul>
               {problem.testcases.map((testCase, index) => (
                 <li key={index}>
-                  Input: {testCase.input}, Expected Output:{" "}
-                  {testCase.expectedOutput}
+                  <strong>Input:</strong> {testCase.input},{" "}
+                  <strong>Expected Output:</strong> {testCase.expectedOutput}
                 </li>
               ))}
             </ul>
           ) : (
             <p>No test cases available</p>
           )}
-          <ul>
-            {problem.constraints.map((constraint, type) => (
-              <li key={type}>
-                {constraint.type}: {constraint.description}
-              </li>
-            ))}
-          </ul>
-          <ul>
-            {problem.examples.map((example, index) => (
-              <li key={index}>
-                Example {index + 1}: <span>Input:</span>
-                <span>{example.input},</span>
-                <span>
-                  <ul>Expected Output: {example.output}</ul>
-                </span>
-                <span>
-                  <ul>Explanation: {example.explanation}</ul>
-                </span>
-              </li>
-            ))}
-          </ul>
+        </div>
+
+        <div className="text-white mb-4">
+          <strong>Constraints:</strong>
+          {problem.constraints && problem.constraints.length > 0 ? (
+            <ul>
+              {problem.constraints.map((constraint, index) => (
+                <li key={index}>
+                  {constraint.type}: {constraint.description}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No constraints available</p>
+          )}
+        </div>
+
+        <div className="text-white mb-4">
+          <strong>Examples:</strong>
+          {problem.examples && problem.examples.length > 0 ? (
+            <ul>
+              {problem.examples.map((example, index) => (
+                <li key={index}>
+                  <strong>Example {index + 1}:</strong>
+                  <ul>
+                    <li>Input: {example.input}</li>
+                    <li>Expected Output: {example.output}</li>
+                    <li>Explanation: {example.explanation}</li>
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No examples available</p>
+          )}
         </div>
       </div>
     </div>
