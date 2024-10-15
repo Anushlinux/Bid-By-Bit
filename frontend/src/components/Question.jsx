@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm"; // Import this if you need GitHub flavored markdown
 
 const Question = () => {
   const { id } = useParams();
@@ -68,7 +69,7 @@ const Question = () => {
           <strong></strong>{" "}
           {problem.tags ? problem.tags.join(", ") : "No tags available"}
         </div>
-        <ReactMarkdown className="text-white  mb-4">
+        <ReactMarkdown className="text-white mb-4" remarkPlugins={[remarkGfm]}>
           {problem.description}
         </ReactMarkdown>
         <div className="text-white mb-4">
