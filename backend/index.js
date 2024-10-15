@@ -103,7 +103,7 @@ app.get("/", async (req, res) => {
 });
 
 if (process.env.NODE_ENV !== "PRODUCTION") {
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || PORT;
   app.listen(port, () => logger.debug(`Server started on port ${port}`));
 } else {
   const httpsOptions = {
