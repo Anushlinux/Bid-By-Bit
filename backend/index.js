@@ -104,7 +104,7 @@ app.get("/", async (req, res) => {
 
 if (process.env.NODE_ENV !== "PRODUCTION") {
   const port = process.env.PORT || PORT;
-  app.listen(port, () => logger.debug(`Server started on port ${port}`));
+  app.listen(port, () => console.log(`Server started on port ${port}`));
 } else {
   const httpsOptions = {
     key: fs.readFileSync("./cert/privkey.pem"),
