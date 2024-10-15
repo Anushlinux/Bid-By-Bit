@@ -14,6 +14,7 @@ const NavbarWithDock = () => {
             style={{ width: "40px", height: "40px" }}
           />
           <span className="text-white text-lg font-semibold">Bid By Bit</span>
+          <span className="text-white text-xs">By CSI-KSKCE</span>
         </div>
       </div>
     </div>

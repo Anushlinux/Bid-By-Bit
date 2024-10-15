@@ -23,7 +23,7 @@ const CodeEditor = () => {
     console.log(JSON.stringify({ code, language: "python" }));
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/problems/${id}/run`,
+        `/api/problems/${id}/run`,
         {
           code: code,
           language: language[1],
@@ -33,6 +33,7 @@ const CodeEditor = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
+          baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
         },
       );
       setOutput(response.data);
@@ -46,7 +47,7 @@ const CodeEditor = () => {
     console.log(JSON.stringify({ code, language: "python" }));
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/problems/${id}/submit`,
+        `/api/problems/${id}/submit`,
         {
           code: code,
           language: language[1],
@@ -56,6 +57,7 @@ const CodeEditor = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
+          baseURL: import.meta.env.VITE_APP_SERVER_ADDRESS,
         },
       );
       setOutput(response.data);

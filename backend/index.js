@@ -4,6 +4,8 @@ import cors from "cors";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import session from "express-session";
+import https from "https";
+import fs from "fs";
 
 import User from "./models/user.js";
 
@@ -18,9 +20,7 @@ const PORT = 4000;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "*",
     credentials: true,
   }),
 );
@@ -100,6 +100,16 @@ app.get("/", async (req, res) => {
   res.send("Welcome to my User Registration and Login API!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== "PRODUCTION") {
+  const port = process.env.PORT || PORT;
+  app.listen(port, () => console.log(`Server started on port ${port}`));
+} else {
+  const httpsOptions = {
+    key: fs.readFileSync("./cert/privkey.pem"),
+    cert: fs.readFileSync("./cert/fullchain.pem"),
+  };
+
+  https.createServer(httpsOptions, app).listen(443, () => {
+    console.log("Server started on https://localhost:443");
+  });
+}

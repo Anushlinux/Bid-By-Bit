@@ -25,7 +25,7 @@ export default function Home() {
       </div>
       <div className="flex flex-1 flex-col md:flex-row gap-20 px-6">
         <ProblemList />
-        <Leaderboard />
+        {/* <Leaderboard /> */}
       </div>
     </div>
   );

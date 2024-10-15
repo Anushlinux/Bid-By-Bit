@@ -41,7 +41,55 @@ const Question = () => {
     fetchProblem();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div
+        className="mx-auto w-1/2 px-4 sm:px-6 lg:px-8 animate-pulse"
+        style={{
+          width: "50vw",
+          height: "calc(87vh)",
+          marginLeft: "auto",
+          marginTop: "6rem",
+          borderRadius: "10px",
+          border: "1px solid ",
+          backgroundColor: "#2e2e2e",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          className="mx-auto max-w-3xl py-3"
+          style={{
+            height: "100%",
+            overflowY: "auto",
+          }}
+        >
+          <h1 className="text-4xl font-bold text-white mb-4 bg-gray-700 h-10 w-3/4"></h1>
+          <div className="text-white mb-4 bg-gray-700 h-6 w-1/2"></div>
+          <div className="text-white mb-4 bg-gray-700 h-40 w-full"></div>
+          <div className="text-white mb-4 bg-gray-700 h-6 w-1/4"></div>
+          <div className="text-white">
+            <div className="bg-gray-700 h-6 w-1/2 mb-2"></div>
+            <ul>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+            </ul>
+            <ul>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+            </ul>
+            <ul>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+              <li className="bg-gray-700 h-6 w-full mb-2"></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <div>{error}</div>;
   if (!problem) return <div>No problem found</div>;
 
@@ -62,8 +110,8 @@ const Question = () => {
       <div
         className="mx-auto max-w-3xl py-3"
         style={{
-          height: "100%", // Make sure this fills the container height
-          overflowY: "auto", // Enable vertical scrolling
+          height: "100%",
+          overflowY: "auto",
         }}
       >
         <h1 className="text-4xl font-bold text-white mb-4">{problem.title}</h1>
